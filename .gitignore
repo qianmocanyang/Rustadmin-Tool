@@ -41,3 +41,7 @@ Desktop.ini
 dev-app/assets/_frames/
 /logo (2).png
 
+
+# 截图：含真实服务器地址/名称，脱敏后方可发布
+docs/screenshots/
+
