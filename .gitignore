@@ -1,0 +1,43 @@
+# 依赖与构建产物
+node_modules/
+package-lock.json.bak
+build/
+dist/
+out/
+*.log
+npm-debug.log*
+
+# 运行时数据：含真实服务器 RCON 密码 / 玩家信息，绝不提交
+dev-app/servers.json
+dev-app/dev_config.json
+dev-app/ban_db.json
+dev-app/player_data.json
+dev-app/offline_players.json
+dev-app/usage_log.json
+dev-app/rust_news_cache.json
+dev-app/custom_commands.json
+dev-app/Logs/
+dev-app/ChatLogs/
+dev-app/RustAdmin/
+dev-app/_probe/
+dev-app/tools/
+
+# 解包产物与原始安装包（体积大，且非源码）
+_unpacked/
+*.exe
+*.asar
+*.7z
+*.zip
+
+# 临时与系统文件
+_probe/
+_private/
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.tmp
+
+# 图标中间帧与根目录原始 logo（成品已在 dev-app/assets）
+dev-app/assets/_frames/
+/logo (2).png
+

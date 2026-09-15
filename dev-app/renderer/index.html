@@ -1,0 +1,1584 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RustAdmin</title>
+  <link rel="icon" type="image/png" href="../assets/logo-256.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 自定义标题栏 -->
+  <div class="titlebar">
+    <div class="titlebar-left">
+      <img class="titlebar-logo" src="../assets/logo-256.png" alt="RustAdmin" draggable="false">
+      <span class="titlebar-name">RustAdmin</span>
+    </div>
+    <div class="titlebar-center">
+      <div class="conn-status" id="conn-status">
+        <span class="conn-dot" id="conn-dot"></span>
+        <span class="conn-text" id="conn-text">未连接</span>
+      </div>
+    </div>
+    <div class="titlebar-right">
+      <button class="theme-toggle" id="theme-toggle-btn" title="切换深/浅色主题">
+        <svg id="theme-icon-dark" viewBox="0 0 24 24" width="15" height="15">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" fill="currentColor"/>
+        </svg>
+        <svg id="theme-icon-light" viewBox="0 0 24 24" width="15" height="15">
+          <circle cx="12" cy="12" r="5" fill="currentColor"/>
+          <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="win-btn" id="btn-min" title="最小化">
+        <svg viewBox="0 0 10 10" width="10" height="10"><line x1="0" y1="5" x2="10" y2="5" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+      <button class="win-btn" id="btn-max" title="最大化">
+        <svg viewBox="0 0 10 10" width="10" height="10"><rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" stroke-width="1" fill="none"/></svg>
+      </button>
+      <button class="win-btn win-close" id="btn-close" title="关闭">
+        <svg viewBox="0 0 10 10" width="10" height="10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-text">
+          <span class="sidebar-brand-title"><span class="brand-rust">RUST</span>服主工具</span>
+          <span class="sidebar-brand-sub">WebSocket RCON</span>
+        </div>
+      </div>
+      <nav class="tab-nav" aria-label="主功能">
+        <div class="tab-nav-inner">
+          <button class="tab-btn active" data-tab="players">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="6" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            在线玩家
+          </button>
+          <button class="tab-btn" data-tab="console">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7l3 3-3 3M11 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            控制台
+          </button>
+          <button class="tab-btn" data-tab="chat">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M17 3H3c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h3l3 3 3-3h5c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1z" stroke="currentColor" stroke-width="1.5"/></svg>
+            聊天信息
+          </button>
+          <button class="tab-btn" data-tab="bans">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="5" x2="15" y2="15" stroke="currentColor" stroke-width="1.5"/></svg>
+            封禁记录
+          </button>
+          <button class="tab-btn" data-tab="battle">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M3 14l4-4 3 2 5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="12" r="1.2" fill="currentColor"/></svg>
+            战斗记录
+          </button>
+          <button class="tab-btn u-hidden" data-tab="steambans">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none">
+              <path d="M10 2l8 4v4c0 5.2-3.4 8.1-8 8-4.6.1-8-2.8-8-8V6l8-4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M7.5 10.2l1.5 1.6 3.5-3.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Steam 封禁查询
+          </button>
+          <button class="tab-btn" data-tab="offline">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="6" r="3.5" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 1.5"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 1.5"/></svg>
+            离线玩家
+          </button>
+          <button class="tab-btn" data-tab="groups">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="3" y="6" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="6" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M1 17c0-2.21 2.686-4 6-4M19 17c0-2.21-2.686-4-6-4M9 9.5c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            权限组
+          </button>
+          <button class="tab-btn" data-tab="allplugins">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+            所有插件
+          </button>
+          <button class="tab-btn" data-tab="serverconfig">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            服务器配置
+          </button>
+          <button class="tab-btn" data-tab="playerperm">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M13 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="10" x2="13" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="15" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M15 8.5v3M13.5 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            玩家授权
+          </button>
+          <button class="tab-btn" data-tab="admincmds">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7l3 3-3 3M11 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            管理员指令
+          </button>
+          <button class="tab-btn" data-tab="itemshop">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="2" y="3" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 7h16M6 3v4M14 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            物品发放
+          </button>
+          <button class="tab-btn" data-tab="about">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 7v.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            关于软件
+          </button>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="sidebar-ver">PC</span>
+      </div>
+    </aside>
+
+    <div class="app-main">
+    <!-- 连接控制栏 -->
+    <div class="conn-bar">
+    <div class="conn-bar-left">
+      <div class="conn-saved">
+        <div class="conn-select-wrap">
+          <select id="server-select" class="conn-select" title="已保存的服务器配置" aria-label="选择已保存的服务器">
+            <option value="">-- 选择服务器 --</option>
+          </select>
+          <span class="conn-select-caret" aria-hidden="true"></span>
+        </div>
+        <button type="button" class="conn-btn conn-btn-icon conn-btn-danger u-hidden" id="btn-delete-server" title="从列表中删除选中的服务器" aria-label="删除选中的服务器">✕</button>
+      </div>
+      <div class="conn-fields" id="conn-inputs">
+        <label class="conn-field conn-field-ip" id="field-ip">
+          <span class="conn-field-label">服务器地址</span>
+          <input id="server-ip" class="conn-input conn-input-ip" type="text" placeholder="IP/域名[:端口]，如 127.0.0.1:28016" value="" autocomplete="off" spellcheck="false" aria-label="服务器地址">
+        </label>
+        <label class="conn-field conn-field-port" id="field-port">
+          <span class="conn-field-label">RCON 端口</span>
+          <input id="server-port" class="conn-input conn-input-port" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="28016" value="28016" title="WebSocket RCON 端口，默认 28016" aria-label="RCON 端口">
+        </label>
+        <label class="conn-field conn-field-pass" id="field-pass">
+          <span class="conn-field-label">RCON 密码</span>
+          <span class="conn-pass-wrap">
+            <input id="server-pass" class="conn-input conn-input-pass" type="password" placeholder="RCON 密码" autocomplete="current-password" aria-label="RCON 密码">
+            <button type="button" class="conn-pass-toggle" id="btn-toggle-pass" title="显示 / 隐藏密码" aria-label="显示或隐藏密码" tabindex="-1">👁</button>
+          </span>
+        </label>
+      </div>
+      <button type="button" class="conn-btn conn-btn-save" id="btn-add-server" title="保存当前填写的内容（Shift+点击可自定义名称）">＋ 保存</button>
+    </div>
+    <div class="conn-bar-right">
+      <div class="stat-pills">
+        <div class="stat-pill" id="pill-online">
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
+            <circle cx="8" cy="5.2" r="2.2" fill="#3fb950" opacity="0.95"/>
+            <path d="M2.2 14c1.2-3.4 3.7-5.1 5.8-5.1S12.6 10.6 13.8 14" stroke="#3fb950" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>在线</span>
+          <b id="stat-online">0</b>
+        </div>
+        <div class="stat-pill" id="pill-fps">
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
+            <path d="M2.2 10.8A6 6 0 1 1 13.7 9" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+            <path d="M8 8l2.7-3" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="8" r="1" fill="#58a6ff"/>
+          </svg>
+          <span>FPS</span>
+          <b id="stat-fps">-</b>
+        </div>
+        <div class="stat-pill" id="pill-joining">
+          <span>加入中</span>
+          <b id="stat-joining">0</b>
+        </div>
+        <div class="stat-pill" id="pill-queue">
+          <span>排队</span>
+          <b id="stat-queue">0</b>
+        </div>
+      </div>
+      <label class="auto-reconnect-toggle" title="断开后自动重新连接服务器">
+        <input type="checkbox" id="chk-auto-reconnect">
+        <span class="auto-reconnect-label">自动重连</span>
+      </label>
+      <button class="action-btn action-connect" id="btn-connect">连接服务器</button>
+    </div>
+  </div>
+
+  <!-- 主内容区（新闻条已移至底部，避免与各面板顶栏重叠） -->
+  <div class="main-content" id="main-content">
+
+    <!-- 在线玩家 -->
+    <div class="tab-panel active" id="panel-players">
+      <div class="panel-toolbar">
+        <div class="toolbar-left">
+          <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="player-search" class="search-input search-input-icon" placeholder="搜索玩家名 / SteamID / IP...">
+            <button type="button" class="search-clear u-hidden" id="player-search-clear" title="清空搜索" aria-label="清空搜索">✕</button>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <span class="count-chip" id="player-count-hint" title="当前在线人数">
+            <b id="player-count">0</b> 在线
+            <em class="count-chip-filter u-hidden" id="player-count-filter"></em>
+          </span>
+          <button class="tool-btn" id="btn-refresh-players">
+            <svg class="tool-btn-icon" viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M13.5 8a5.5 5.5 0 1 1-1.35-3.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            刷新
+          </button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table players-table" id="players-table">
+          <thead>
+            <tr>
+              <th class="col-player">玩家</th>
+              <th class="col-addr">地址 / 城市</th>
+              <th class="col-ping">延迟</th>
+              <th class="col-pos">坐标</th>
+              <th class="col-time">在线时长</th>
+              <th class="col-ban">封禁</th>
+              <th class="col-act">操作</th>
+            </tr>
+          </thead>
+          <tbody id="players-tbody">
+            <tr class="empty-row"><td colspan="7">
+              <div class="empty-state">
+                <svg viewBox="0 0 48 48" width="42" height="42" fill="none" aria-hidden="true">
+                  <circle cx="24" cy="17" r="8.5" stroke="currentColor" stroke-width="2" opacity="0.55"/>
+                  <path d="M9 41c0-8.3 6.7-15 15-15s15 6.7 15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+                  <circle cx="24" cy="17" r="3" fill="currentColor" opacity="0.5"/>
+                </svg>
+                <p>暂无在线玩家</p>
+                <span class="empty-sub">连接服务器后这里会显示实时在线列表</span>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Steam 封禁查询（已集成到在线玩家表格；此处保留但隐藏） -->
+    <div class="tab-panel u-hidden" id="panel-steambans">
+      <div class="panel-toolbar">
+        <div class="toolbar-left">
+          <input id="steamban-search" class="search-input" placeholder="输入 SteamID 查询封禁记录...">
+        </div>
+        <div class="toolbar-right">
+          <button class="tool-btn" id="btn-steamban-check">查询</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div id="steamban-result" class="empty-state">
+          <p>请输入 SteamID，然后点击“查询”</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 控制台 -->
+    <div class="tab-panel" id="panel-console">
+      <div class="console-toolbar">
+        <div class="console-filters">
+          <button class="filter-btn active" data-filter="all">全部 <em class="fbtn-cnt" data-cnt="all">0</em></button>
+          <button class="filter-btn" data-filter="cmd">命令 <em class="fbtn-cnt" data-cnt="cmd">0</em></button>
+          <button class="filter-btn" data-filter="chat">聊天 <em class="fbtn-cnt" data-cnt="chat">0</em></button>
+          <button class="filter-btn" data-filter="join">加入/离开 <em class="fbtn-cnt" data-cnt="join">0</em></button>
+          <button class="filter-btn" data-filter="kill">击杀 <em class="fbtn-cnt" data-cnt="kill">0</em></button>
+          <button class="filter-btn" data-filter="error">错误 <em class="fbtn-cnt" data-cnt="error">0</em></button>
+        </div>
+        <div class="console-toolbar-right">
+          <div class="search-wrap console-search-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="console-search" class="search-input search-input-icon" placeholder="搜索日志…" autocomplete="off">
+            <button type="button" class="search-clear u-hidden" id="console-search-clear" title="清空搜索" aria-label="清空搜索">✕</button>
+          </div>
+          <button class="tool-btn is-active" id="btn-console-follow" title="自动滚动到最新日志">跟随</button>
+          <button class="tool-btn" id="btn-open-logs" title="打开本地日志目录">日志目录</button>
+          <button class="tool-btn" id="btn-save-console-local" title="把当前控制台内容另存为 txt">另存为</button>
+          <button class="tool-btn tool-btn-danger" id="btn-clear-console" title="清空显示并删除该服务器的本地控制台日志">清空</button>
+        </div>
+      </div>
+      <div class="console-body">
+        <div class="console-area" id="console-area"></div>
+        <button class="console-newlines u-hidden" id="console-newlines" title="跳到最新"></button>
+      </div>
+      <div class="console-input-bar">
+        <button class="cmd-palette-toggle" id="btn-cmd-palette" title="常用命令（Ctrl+K）">⚡ 常用命令</button>
+        <input id="console-input" class="console-input" placeholder="输入 RCON 命令，Enter 发送 · ↑/↓ 翻历史 · Ctrl+K 常用命令" autocomplete="off" spellcheck="false">
+        <button class="action-btn action-connect" id="btn-send-cmd">发送</button>
+      </div>
+      <div class="cmd-palette u-hidden" id="cmd-palette">
+        <div class="cmd-palette-head">
+          <input id="cmd-palette-search" class="search-input" placeholder="搜索命令 / 说明 / 分类…（Enter 填入第一条，Esc 关闭）" autocomplete="off">
+          <div class="cmd-palette-cats" id="cmd-palette-cats"></div>
+        </div>
+        <div class="cmd-palette-list" id="cmd-palette-list"></div>
+        <div class="cmd-palette-foot">
+          <span>点击填入 · Shift+点击直接执行 · 右键复制命令</span>
+          <span class="cmd-palette-count" id="cmd-palette-count"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 聊天信息 -->
+    <div class="tab-panel" id="panel-chat">
+      <div class="chat-toolbar">
+        <div class="chat-channels">
+          <button class="channel-btn active" data-channel="all">全部 <em class="fbtn-cnt" data-chatcnt="all">0</em></button>
+          <button class="channel-btn" data-channel="全部">全服 <em class="fbtn-cnt" data-chatcnt="全部">0</em></button>
+          <button class="channel-btn" data-channel="队伍">队伍 <em class="fbtn-cnt" data-chatcnt="队伍">0</em></button>
+          <button class="channel-btn" data-channel="卡组">卡组 <em class="fbtn-cnt" data-chatcnt="卡组">0</em></button>
+          <button class="channel-btn" data-channel="管理">管理 <em class="fbtn-cnt" data-chatcnt="管理">0</em></button>
+        </div>
+        <div class="chat-toolbar-right">
+          <span class="autosave-chip" id="chat-autosave" title="数据会定时自动保存到本地 ChatLogs 文件夹">自动保存 --:--:--</span>
+          <div class="search-wrap chat-search-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="chat-search" class="search-input search-input-icon" placeholder="搜索玩家 / 内容…" autocomplete="off">
+            <button type="button" class="search-clear u-hidden" id="chat-search-clear" title="清空搜索" aria-label="清空搜索">✕</button>
+          </div>
+          <button class="tool-btn is-active" id="btn-chat-follow" title="自动滚动到最新消息">跟随</button>
+          <button class="tool-btn" id="btn-save-chat" title="把当前聊天记录导出为 txt 到 ChatLogs 文件夹">导出</button>
+          <button class="tool-btn" id="btn-open-chatlogs" title="打开本地聊天记录文件夹">记录目录</button>
+          <button class="tool-btn tool-btn-danger" id="btn-clear-chat" title="清空显示并删除该服务器的本地聊天记录">清空</button>
+        </div>
+      </div>
+      <div class="chat-body">
+        <div class="chat-area" id="chat-area"></div>
+        <button class="console-newlines u-hidden" id="chat-newlines" title="跳到最新"></button>
+      </div>
+      <div class="chat-input-bar">
+        <button class="chat-filter-chip u-hidden" id="chat-filter-chip" title="点击清除玩家筛选"></button>
+        <input id="chat-input" class="console-input" placeholder="管理员广播内容，Enter 发送（以 SERVER 身份 say）" autocomplete="off">
+        <button class="action-btn action-connect" id="btn-send-chat">广播</button>
+      </div>
+    </div>
+
+    <!-- 封禁记录 -->
+    <div class="tab-panel" id="panel-bans">
+      <div class="panel-toolbar">
+        <div class="toolbar-left">
+          <div class="filter-chips">
+            <button class="filter-btn active" data-source="all">全部 <em class="fbtn-cnt" data-bancnt="all">0</em></button>
+            <button class="filter-btn" data-source="local">本地封禁库 <em class="fbtn-cnt" data-bancnt="local">0</em></button>
+            <button class="filter-btn" data-source="server">服务器 banlist <em class="fbtn-cnt" data-bancnt="server">0</em></button>
+          </div>
+          <div class="search-wrap bans-search-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="ban-search" class="search-input search-input-icon" placeholder="搜索 SteamID / 玩家名 / 原因…" autocomplete="off">
+            <button type="button" class="search-clear u-hidden" id="ban-search-clear" title="清空搜索">✕</button>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <button class="tool-btn" id="btn-refresh-bans">
+            <svg class="tool-btn-icon" viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M13.5 8a5.5 5.5 0 1 1-1.35-3.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            刷新
+          </button>
+          <button class="tool-btn" id="btn-export-bans">导出封禁库</button>
+          <button class="tool-btn" id="btn-sync-bans">同步到全部服务器</button>
+          <button class="tool-btn tool-btn-danger" id="btn-ban-add">+ 手动封禁</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table ban-table">
+          <thead>
+            <tr>
+              <th class="col-player">玩家</th>
+              <th class="col-ip">IP 地址</th>
+              <th class="col-time">封禁时间</th>
+              <th class="col-reason">原因</th>
+              <th class="col-src">来源</th>
+              <th class="col-act">操作</th>
+            </tr>
+          </thead>
+          <tbody id="bans-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 战斗记录 -->
+    <div class="tab-panel" id="panel-battle">
+      <div class="panel-toolbar">
+        <div class="toolbar-left">
+          <select id="battle-player-select" class="conn-select" title="从在线/离线玩家中快速选择" aria-label="选择玩家"></select>
+          <div class="search-wrap battle-steamid-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="battle-steamid" class="search-input search-input-icon" placeholder="SteamID（17 位数字）" autocomplete="off">
+          </div>
+          <label class="inline-field"><span>条数</span>
+            <input id="battle-lines" class="cfg-input cfg-input-xs" type="number" value="30" min="1" max="200">
+          </label>
+        </div>
+        <div class="toolbar-right">
+          <span class="count-chip">共 <b id="battle-count">0</b> 条</span>
+          <div class="search-wrap"><input id="battle-search" class="search-input" placeholder="筛选武器 / 部位 / 攻击者…" autocomplete="off"></div>
+          <button class="tool-btn" id="btn-battle-export">导出</button>
+          <button class="tool-btn" id="btn-battle-query">查询战斗记录</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table battle-table">
+          <thead>
+            <tr>
+              <th class="col-time">时间</th>
+              <th>攻击者</th>
+              <th>武器</th>
+              <th class="col-num">弹药</th>
+              <th>部位</th>
+              <th class="col-num">距离</th>
+              <th class="col-hp">血量变化</th>
+            </tr>
+          </thead>
+          <tbody id="battle-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 离线玩家 -->
+    <div class="tab-panel" id="panel-offline">
+      <div class="panel-toolbar">
+        <div class="toolbar-left">
+          <div class="filter-chips">
+            <button class="filter-btn active" data-range="all">全部 <em class="fbtn-cnt" data-offcnt="all">0</em></button>
+            <button class="filter-btn" data-range="today">今天 <em class="fbtn-cnt" data-offcnt="today">0</em></button>
+            <button class="filter-btn" data-range="7d">近 7 天 <em class="fbtn-cnt" data-offcnt="7d">0</em></button>
+          </div>
+          <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="offline-search" class="search-input search-input-icon" placeholder="搜索玩家名 / SteamID / IP…" autocomplete="off">
+            <button type="button" class="search-clear u-hidden" id="offline-search-clear" title="清空搜索">✕</button>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <button class="tool-btn" id="btn-refresh-offline">
+            <svg class="tool-btn-icon" viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M13.5 8a5.5 5.5 0 1 1-1.35-3.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            刷新
+          </button>
+          <button class="tool-btn tool-btn-danger" id="btn-clear-offline">清空记录</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table offline-table">
+          <thead>
+            <tr>
+              <th class="col-player">玩家</th>
+              <th class="col-ip">IP 地址</th>
+              <th>最后位置</th>
+              <th class="col-time">下线时间</th>
+              <th>停留时长</th>
+              <th class="col-act">操作</th>
+            </tr>
+          </thead>
+          <tbody id="offline-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 权限组 -->
+    <div class="tab-panel" id="panel-groups">
+      <div class="panel-toolbar">
+        <div class="toolbar-left">
+          <div class="search-wrap groups-search-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="group-search" class="search-input search-input-icon" placeholder="搜索权限组…" autocomplete="off">
+            <button type="button" class="search-clear u-hidden" id="group-search-clear" title="清空搜索" aria-label="清空搜索">✕</button>
+          </div>
+          <span class="count-chip">共 <b id="groups-count">0</b> 个组</span>
+        </div>
+        <div class="toolbar-right">
+          <input id="new-group-name" class="cfg-input new-group-input" placeholder="新权限组名称">
+          <button class="tool-btn tool-btn-primary" id="btn-create-group">＋ 创建权限组</button>
+          <button class="tool-btn" id="btn-refresh-groups">
+            <svg class="tool-btn-icon" viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M13.5 8a5.5 5.5 0 1 1-1.35-3.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            刷新
+          </button>
+        </div>
+      </div>
+      <div class="groups-layout">
+        <div class="groups-left">
+          <div class="groups-left-head">
+            <div class="groups-left-title">权限组列表</div>
+            <div class="groups-left-sub" id="groups-count-hint">0 个组</div>
+          </div>
+          <div class="groups-list" id="groups-list">
+            <div class="empty-state u-py-28">
+              <p>暂无权限组数据（需连接服务器）</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="groups-right">
+          <div class="group-detail-head">
+            <div class="group-detail-title">
+              <span>组详情</span>
+              <b id="group-detail-name">未选择</b>
+              <em class="group-head-badge u-hidden" id="group-head-members">0 成员</em>
+              <em class="group-head-badge u-hidden" id="group-head-perms">0 权限</em>
+            </div>
+            <div class="group-detail-actions">
+              <button class="tool-btn tool-btn-primary" id="btn-group-add-perm" disabled>＋ 添加权限</button>
+              <button class="tool-btn tool-btn-danger" id="btn-group-delete" disabled>删除该组</button>
+            </div>
+          </div>
+
+          <div class="group-detail-body">
+            <div class="group-detail-card">
+              <div class="group-card-title">组成员 <em class="card-count" id="group-member-count">0</em></div>
+              <div class="group-card-sub">为 SteamID 添加/移除该组（成员管理依赖 uMod 的 oxide.usergroup）</div>
+              <div class="group-member-row">
+                <input id="group-member-steamid" class="cfg-input" placeholder="输入 17 位 SteamID，Enter 直接添加…" autocomplete="off">
+                <button class="cfg-btn cfg-btn-primary" id="btn-group-member-add" disabled>添加成员</button>
+                <button class="cfg-btn cfg-btn-ghost" id="btn-group-member-remove" disabled>移除成员</button>
+              </div>
+              <div class="group-member-hint" id="group-member-hint"></div>
+              <div class="group-member-list" id="group-member-list">
+                <div class="empty-state u-py-18"><p>暂无成员数据</p></div>
+              </div>
+            </div>
+
+            <div class="group-detail-card">
+              <div class="group-card-title">组权限 <em class="card-count" id="group-perm-count">0</em></div>
+              <div class="group-card-sub">支持搜索与多选添加，避免手打权限名</div>
+              <div class="group-perm-wrap">
+                <div class="group-perm-toolbar">
+                  <input id="group-perm-filter" class="search-input" placeholder="搜索已授予的权限…" autocomplete="off">
+                  <button class="tool-btn" id="btn-group-perm-copy" title="复制该组全部权限名">复制全部</button>
+                  <button class="tool-btn" id="btn-group-refresh-detail" disabled>刷新详情</button>
+                </div>
+                <div class="group-perm-list" id="group-perm-list">
+                  <div class="empty-state u-py-26"><p>请选择左侧权限组</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 所有插件 -->
+    <div class="tab-panel" id="panel-allplugins">
+      <div class="panel-toolbar">
+        <div class="toolbar-left">
+          <input id="plugin-search" class="search-input" placeholder="搜索插件名称 / 作者...">
+        </div>
+        <div class="toolbar-right">
+          <span class="toolbar-hint" id="plugin-count">共 0 个插件</span>
+          <button class="tool-btn" id="btn-refresh-plugins">
+            <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M13.5 8a5.5 5.5 0 1 1-1.35-3.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            刷新
+          </button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th class="th-w-50">序号</th><th>插件名称</th><th>版本信息</th><th>插件作者</th><th>操作</th></tr></thead>
+          <tbody id="allplugins-tbody">
+            <tr class="empty-row"><td colspan="5">
+              <div class="empty-state">
+                <svg viewBox="0 0 48 48" width="40" height="40" fill="none"><rect x="6" y="6" width="15" height="15" rx="3" stroke="#2a3348" stroke-width="2"/><rect x="27" y="6" width="15" height="15" rx="3" stroke="#2a3348" stroke-width="2"/><rect x="6" y="27" width="15" height="15" rx="3" stroke="#2a3348" stroke-width="2"/><rect x="27" y="27" width="15" height="15" rx="3" stroke="#2a3348" stroke-width="2"/></svg>
+                <p>暂无插件数据（需连接服务器）</p>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 服务器配置 -->
+    <div class="tab-panel" id="panel-serverconfig">
+      <div class="cfg-statusbar" id="cfg-statusbar">
+        <span class="cfg-status-dot" id="cfg-status-dot"></span>
+        <span class="cfg-status-text" id="cfg-status-text">尚未读取配置快照（连接服务器后自动读取）</span>
+        <button class="tool-btn" id="btn-refresh-cfg" title="重新从服务器读取当前配置值">重新读取</button>
+      </div>
+      <div class="config-layout">
+        <!-- 左列 -->
+        <div class="config-col">
+          <div class="cfg-card">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M10 2l8 4v6l-8 4-8-4V6l8-4z" stroke="#e8611a" stroke-width="1.5" fill="none"/><circle cx="10" cy="10" r="3" fill="#e8611a" opacity="0.5"/></svg>
+              服务器标签
+            </div>
+            <div class="tag-grid">
+              <label class="tag-chip"><input type="checkbox" value="monthly"> 月清</label>
+              <label class="tag-chip"><input type="checkbox" value="biweekly"> 半月清</label>
+              <label class="tag-chip"><input type="checkbox" value="weekly"> 周清</label>
+              <label class="tag-chip"><input type="checkbox" value="vanilla"> 普通模式</label>
+              <label class="tag-chip"><input type="checkbox" value="hardcore"> 硬核模式</label>
+              <label class="tag-chip"><input type="checkbox" value="softcore"> 萌新模式</label>
+              <label class="tag-chip"><input type="checkbox" value="pve"> PvE</label>
+              <label class="tag-chip"><input type="checkbox" value="roleplay"> 角色扮演</label>
+              <label class="tag-chip"><input type="checkbox" value="creative"> 创意</label>
+              <label class="tag-chip"><input type="checkbox" value="minigame"> 迷你游戏</label>
+              <label class="tag-chip"><input type="checkbox" value="training"> 模拟训练</label>
+              <label class="tag-chip"><input type="checkbox" value="battlefield"> 战场训练</label>
+              <label class="tag-chip"><input type="checkbox" value="broyale"> 大逃杀</label>
+              <label class="tag-chip"><input type="checkbox" value="EA"> 东亚</label>
+              <label class="tag-chip"><input type="checkbox" value="NA"> 北美</label>
+              <label class="tag-chip"><input type="checkbox" value="EU"> 欧洲</label>
+            </div>
+            <div class="cfg-hint">最多选择 4 个标签 <span class="tag-counter" id="tag-counter">已选 0 / 4</span></div>
+            <button class="cfg-btn cfg-btn-primary" id="btn-confirm-tags">确认标签</button>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="10" r="7" stroke="#58a6ff" stroke-width="1.5"/><path d="M10 6v4l2.5 2.5" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+              天气设置
+            </div>
+            <div class="weather-grid">
+              <button class="weather-btn active" data-w="clear">大晴天</button>
+              <button class="weather-btn" data-w="cloudy">多云</button>
+              <button class="weather-btn" data-w="wind">大风</button>
+              <button class="weather-btn" data-w="fog">暗天</button>
+              <button class="weather-btn" data-w="storm">暴雨</button>
+              <button class="weather-btn" data-w="default">默认</button>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 10h12" stroke="#3fb950" stroke-width="1.5" stroke-linecap="round"/><path d="M10 4v12" stroke="#3fb950" stroke-width="1.5" stroke-linecap="round"/></svg>
+              服务器维护
+            </div>
+            <div class="cfg-row u-wrap">
+              <button class="cfg-btn cfg-btn-primary" id="btn-server-save" title="server.save">保存配置</button>
+              <button class="cfg-btn" id="btn-server-writecfg" title="server.writecfg">写入配置</button>
+              <button class="cfg-btn cfg-btn-ghost" id="btn-server-status" title="status">服务器状态</button>
+              <button class="cfg-btn cfg-btn-ghost" id="btn-server-info" title="server.info">服务器信息</button>
+            </div>
+            <div class="cfg-hint">点击后会在下方显示回包，可复制保存</div>
+            <textarea id="server-maint-output" class="cfg-textarea" rows="5" placeholder="这里显示 status/server.info 等回包..." readonly></textarea>
+            <div class="cfg-row u-justify-end">
+              <button class="cfg-btn cfg-btn-ghost" id="btn-copy-maint-output">复制输出</button>
+              <button class="cfg-btn" id="btn-clear-maint-output">清空输出</button>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="3" y="8" width="6" height="5" rx="1" stroke="#d29922" stroke-width="1.5"/><rect x="11" y="8" width="6" height="5" rx="1" stroke="#d29922" stroke-width="1.5"/><path d="M1 17c0-2.21 2.686-4 6-4M19 17c0-2.21-2.686-4-6-4" stroke="#d29922" stroke-width="1.5" stroke-linecap="round"/></svg>
+              组队限制
+            </div>
+            <div class="cfg-row">
+              <input id="team-limit" class="cfg-input" type="number" min="1" max="8" placeholder="人数 1-8">
+              <button class="cfg-btn" id="btn-set-team">设置</button>
+            </div>
+            <button class="cfg-btn cfg-btn-ghost" id="btn-default-team">恢复默认(8人)</button>
+            <div class="res-item u-mt-10">
+              <span>最大玩家数</span>
+              <input id="server-maxplayers" class="cfg-input" type="number" min="1" max="500" placeholder="server.maxplayers">
+              <button class="cfg-btn cfg-btn-xs" id="btn-set-maxplayers">设置</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 中列 -->
+        <div class="config-col">
+          <div class="cfg-card cfg-card-wide">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="#3fb950" stroke-width="1.5"/><path d="M2 8h16" stroke="#3fb950" stroke-width="1.5"/><circle cx="5" cy="6" r="0.8" fill="#3fb950"/><circle cx="8" cy="6" r="0.8" fill="#3fb950"/></svg>
+              服务器信息
+            </div>
+            <div class="cfg-field">
+              <label>服务器名称</label>
+              <div class="cfg-field-row">
+                <input id="cfg-hostname" class="cfg-input cfg-input-flex" placeholder="服务器显示名称">
+                <button class="cfg-btn" id="btn-set-hostname">修改</button>
+              </div>
+            </div>
+            <div class="cfg-field">
+              <label>服务器链接</label>
+              <div class="cfg-field-row">
+                <input id="cfg-serverlink" class="cfg-input cfg-input-flex" placeholder="steam://connect/...">
+                <button class="cfg-btn" id="btn-copy-link">复制</button>
+              </div>
+            </div>
+            <div class="cfg-field">
+              <label>服务器Logo</label>
+              <div class="cfg-field-row">
+                <input id="cfg-logo" class="cfg-input cfg-input-flex" placeholder="Logo URL">
+                <button class="cfg-btn" id="btn-set-logo">设置</button>
+              </div>
+            </div>
+            <div class="cfg-field">
+              <label>服务器介绍</label>
+              <textarea id="cfg-desc" class="cfg-textarea" rows="3" placeholder="服务器介绍..."></textarea>
+              <button class="cfg-btn" id="btn-set-desc">保存介绍</button>
+            </div>
+          </div>
+
+          <div class="cfg-card cfg-card-wide">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M3 17h2l1-5h8l1 5h2" stroke="#f85149" stroke-width="1.5" stroke-linecap="round"/><path d="M10 2L3 9h14L10 2z" stroke="#f85149" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="13" r="2" fill="#f85149"/></svg>
+              武直伤害
+            </div>
+            <div class="cfg-row">
+              <label>巡逻时间(分)</label>
+              <input id="heli-time" class="cfg-input" type="number" placeholder="分钟">
+              <button class="cfg-btn" id="btn-set-heli-time">确定</button>
+            </div>
+            <div class="cfg-row">
+              <label>伤害倍率 0-1</label>
+              <input id="heli-dmg" class="cfg-input" type="number" step="0.1" min="0" max="1" placeholder="0-1">
+              <button class="cfg-btn" id="btn-set-heli-dmg">确定</button>
+            </div>
+            <div class="heli-btns">
+              <button class="cfg-btn cfg-btn-danger" id="btn-heli-no-gun">武直不开枪</button>
+              <button class="cfg-btn cfg-btn-success" id="btn-heli-gun">武直开枪</button>
+              <button class="cfg-btn cfg-btn-ghost" id="btn-heli-default">还原默认值</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右列 -->
+        <div class="config-col">
+          <div class="cfg-card">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="10" r="7" stroke="#d29922" stroke-width="1.5"/><path d="M10 6v4l2.5 2.5" stroke="#d29922" stroke-width="1.5" stroke-linecap="round"/></svg>
+              环境时间
+            </div>
+            <div class="cfg-row">
+              <input id="server-time" class="cfg-input" type="number" min="0" max="24" step="0.5" placeholder="0-24">
+              <button class="cfg-btn" id="btn-set-time">设置</button>
+            </div>
+            <div class="res-item">
+              <span>白天时长</span>
+              <input id="env-daylength" class="cfg-input" type="number" min="1" step="1" placeholder="分钟">
+            </div>
+            <div class="res-item">
+              <span>夜晚时长</span>
+              <input id="env-nightlength" class="cfg-input" type="number" min="1" step="1" placeholder="分钟">
+              <button class="cfg-btn cfg-btn-xs" id="btn-set-daynight">设置</button>
+            </div>
+            <div class="cfg-hint">对应 env.time / env.daylength / env.nightlength，连接后会读出当前值</div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M2 18L10 4l8 14H2z" stroke="#3fb950" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 10v4M10 8v.01" stroke="#3fb950" stroke-width="1.5" stroke-linecap="round"/></svg>
+              资源刷新
+            </div>
+            <div class="res-item">
+              <span>最大密度</span>
+              <input id="res-maxden" class="cfg-input" type="number" step="0.1" placeholder="默认1">
+              <button class="cfg-btn cfg-btn-xs" data-res="maxden">设置</button>
+            </div>
+            <div class="res-item">
+              <span>最小密度</span>
+              <input id="res-minden" class="cfg-input" type="number" step="0.1" placeholder="默认0.5">
+              <button class="cfg-btn cfg-btn-xs" data-res="minden">设置</button>
+            </div>
+            <div class="res-item">
+              <span>最大速度</span>
+              <input id="res-maxspd" class="cfg-input" type="number" placeholder="默认值">
+              <button class="cfg-btn cfg-btn-xs" data-res="maxspd">设置</button>
+            </div>
+            <div class="res-item">
+              <span>最小速度</span>
+              <input id="res-minspd" class="cfg-input" type="number" placeholder="默认值">
+              <button class="cfg-btn cfg-btn-xs" data-res="minspd">设置</button>
+            </div>
+            <div class="cfg-hint">树木、矿石等资源的刷新与密度，默认最大为1，最小为0.5</div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="10" r="7" stroke="#e8611a" stroke-width="1.5"/><path d="M10 6v4" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round"/></svg>
+              承重模式
+            </div>
+            <div class="scale-btns">
+              <button class="cfg-btn cfg-btn-success" id="btn-scale-on">开启</button>
+              <button class="cfg-btn cfg-btn-danger" id="btn-scale-off">关闭</button>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M6 6h8v8H6z" stroke="#58a6ff" stroke-width="1.5"/><path d="M4 10h2M14 10h2M10 4v2M10 14v2" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+              NPC / 战斗记录
+            </div>
+            <div class="cfg-row u-wrap">
+              <button class="cfg-btn cfg-btn-success" id="btn-npc-on">开启 NPC</button>
+              <button class="cfg-btn cfg-btn-danger" id="btn-npc-off">关闭 NPC</button>
+            </div>
+            <div class="cfg-row">
+              <input id="combatlog-size" class="cfg-input" type="number" min="0" step="1" placeholder="combatlogsize (例如 30)">
+              <button class="cfg-btn" id="btn-set-combatlog">设置</button>
+            </div>
+            <div class="cfg-hint">NPC 开关：global.npc_enabled；战斗记录：server.combatlogsize</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 玩家授权 -->
+    <div class="tab-panel" id="panel-playerperm">
+      <div class="perm-new-layout">
+        <!-- 左侧：玩家选择 -->
+        <div class="perm-player-section">
+          <div class="perm-player-header">
+            <h3>
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="6" r="3.5" stroke="#e8611a" stroke-width="1.5"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round"/></svg>
+              选择玩家
+            </h3>
+            <div class="perm-tabs">
+              <button class="perm-tab-btn active" id="perm-tab-online" onclick="switchPermTab('online')">在线玩家</button>
+              <button class="perm-tab-btn" id="perm-tab-offline" onclick="switchPermTab('offline')">曾玩玩家</button>
+            </div>
+          </div>
+          <div class="search-wrap perm-player-search-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="perm-player-search" class="search-input search-input-icon perm-player-search" placeholder="搜索玩家名称或 SteamID…" autocomplete="off">
+            <button type="button" class="search-clear u-hidden" id="perm-search-clear" title="清空搜索" aria-label="清空搜索">✕</button>
+          </div>
+          <div class="perm-player-list" id="perm-player-list-online"></div>
+          <div class="perm-player-list perm-player-list-hidden" id="perm-player-list-offline"></div>
+          <div id="perm-selected-info" class="perm-selected-info none-selected">
+            <span>⚠️</span> 尚未选择任何玩家，请从上方列表中选择
+          </div>
+        </div>
+
+        <!-- 右侧：权限选择 + 操作 -->
+        <div class="perm-action-section">
+          <div class="perm-action-header">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 10h8M10 4l6 6-6 6" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            权限与操作
+          </div>
+
+          <!-- 已选玩家：Oxide 插件权限列表（单选时自动加载，可删/增） -->
+          <div class="perm-lookup-section" id="perm-selected-perms-section">
+            <div class="perm-lookup-head">
+              <span class="perm-lookup-title">已选玩家 · 插件权限</span>
+              <button type="button" class="cfg-btn cfg-btn-ghost cfg-btn-xs" id="perm-selected-perms-refresh" title="重新从服务器拉取该玩家权限">刷新</button>
+            </div>
+            <p id="perm-selected-perms-status" class="perm-lookup-hint">请先在左侧列表中点击选择<strong>一名</strong>玩家，将自动显示其 Oxide 权限（按插件分组）。</p>
+            <div id="perm-selected-perms-groups" class="perm-lookup-groups" hidden></div>
+            <div id="perm-selected-perms-list" class="perm-lookup-list"></div>
+            <details id="perm-selected-perms-raw-wrap" class="perm-lookup-raw-wrap" hidden>
+              <summary>查看原始回显</summary>
+              <pre id="perm-selected-perms-raw" class="perm-lookup-raw"></pre>
+            </details>
+
+            <div class="perm-add-by-plugin-block">
+              <div class="perm-add-by-plugin-title">选择插件后，点击下方权限即可增加（无需输入代码）</div>
+              <div class="perm-lookup-row">
+                <select id="perm-add-plugin-select" class="cfg-input perm-lookup-input" aria-label="选择要授权插件"></select>
+                <button type="button" class="cfg-btn cfg-btn-ghost cfg-btn-xs" id="perm-add-catalog-refresh" title="从服务器重新加载插件列表与全部权限节点">刷新目录</button>
+              </div>
+              <input type="search" id="perm-add-perm-filter" class="cfg-input perm-add-perm-filter" placeholder="筛选权限关键字…" autocomplete="off" spellcheck="false" aria-label="筛选权限">
+              <div id="perm-add-plugin-perm-chips" class="perm-add-plugin-perm-chips"></div>
+            </div>
+
+            <details class="perm-add-manual-details">
+              <summary>高级：手动输入权限代码</summary>
+              <div class="perm-lookup-row perm-lookup-add-row">
+                <input type="text" id="perm-selected-perms-add-input" class="cfg-input perm-lookup-input" placeholder="例如 vanish.allow" autocomplete="off" spellcheck="false">
+                <button type="button" class="cfg-btn cfg-btn-success" id="perm-selected-perms-add-btn">增加</button>
+              </div>
+            </details>
+          </div>
+
+          <!-- 权限网格 -->
+          <div id="perm-perm-grid"></div>
+
+          <!-- 自定义权限 -->
+          <div class="perm-custom-row">
+            <input id="perm-custom-code" class="cfg-input perm-custom-code-input" placeholder="输入自定义权限代码...">
+            <button class="cfg-btn cfg-btn-ghost" onclick="permCustomGrant()">授予</button>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="perm-action-meta">
+            <span class="count-chip" id="perm-selected-count">未选择</span>
+            <span class="count-chip">已勾选权限 <b id="perm-perm-count">0</b></span>
+          </div>
+          <div class="perm-action-btns perm-action-btns-spaced">
+            <button class="cfg-btn cfg-btn-success" onclick="permGrantSelected()">授予选中权限</button>
+            <button class="cfg-btn cfg-btn-danger" onclick="permRevokeSelected()">撤销选中权限</button>
+            <button class="cfg-btn" onclick="permAddAdmin()">设为管理员</button>
+            <button class="cfg-btn" onclick="permRemoveAdmin()">移除管理员</button>
+          </div>
+
+          <!-- 经济操作 -->
+          <div class="perm-econ-section">
+            <div class="perm-econ-title">经济操作</div>
+            <div class="modal-row perm-econ-row">
+              <input id="perm-coins" class="cfg-input cfg-input-xs perm-econ-input" type="number" placeholder="金币数">
+              <button class="cfg-btn cfg-btn-success perm-econ-btn" onclick="permGiveCoins()">赠送金币</button>
+            </div>
+            <div class="modal-row">
+              <input id="perm-points" class="cfg-input cfg-input-xs perm-econ-input" type="number" placeholder="积分数">
+              <button class="cfg-btn cfg-btn-success perm-econ-btn" onclick="permGivePoints()">赠送积分</button>
+            </div>
+          </div>
+
+          <div id="perm-result" class="perm-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 管理员指令 -->
+    <div class="tab-panel" id="panel-admincmds">
+      <div class="cmd-page-shell">
+        <div class="cmd-page-toolbar">
+          <input type="text" id="cmd-global-search" class="search-input cmd-search-wide" placeholder="搜索指令名称、说明或命令关键字…">
+          <select id="cmd-category-filter" class="conn-select cmd-category-filter" title="按分类筛选管理员指令">
+            <option value="all">全部分类</option>
+          </select>
+          <input type="text" id="cmd-quick-steamid" class="search-input cmd-steamid-input" placeholder="默认 SteamID（含 {steamid} 的卡片会自动使用）" title="仅本页快捷占位，与玩家授权多选无关">
+          <label class="cmd-compact-toggle" title="隐藏冗余说明，减少滚动">
+            <input type="checkbox" id="cmd-compact-toggle" checked>
+            <span>紧凑模式</span>
+          </label>
+          <button type="button" class="tool-btn" id="btn-cmd-refresh" title="重新渲染列表">刷新</button>
+        </div>
+        <div class="cmd-result-bar">
+          <textarea id="admincmd-output" class="cfg-textarea" rows="3" placeholder="这里显示管理员指令执行结果（成功/失败/超时/回包）..." readonly></textarea>
+          <div class="cmd-result-actions">
+            <button type="button" class="cfg-btn cfg-btn-ghost" id="btn-copy-admincmd-output">复制输出</button>
+            <button type="button" class="cfg-btn" id="btn-clear-admincmd-output">清空输出</button>
+          </div>
+        </div>
+        <div class="cmd-layout" id="cmd-layout"></div>
+      </div>
+    </div>
+
+    <!-- 物品发放 -->
+    <div class="tab-panel" id="panel-itemshop">
+      <div class="itemshop-layout">
+        <!-- 左侧：物品选择区 -->
+        <div class="itemshop-left">
+          <div class="itemshop-card">
+            <div class="itemshop-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="2" y="3" width="16" height="15" rx="2" stroke="#e8611a" stroke-width="1.5"/><path d="M2 7h16M6 3v4M14 3v4" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round"/></svg>
+              选择物品
+              <span class="itemshop-header-hint" id="item-selected-count">已选 0 种物品</span>
+            </div>
+            <div class="search-wrap item-search-wrap">
+              <svg class="search-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="item-search" class="search-input search-input-icon" placeholder="搜索物品名称或 shortname…" autocomplete="off">
+              <button type="button" class="search-clear u-hidden" id="item-search-clear" title="清空搜索" aria-label="清空搜索">✕</button>
+            </div>
+            <div class="itemshop-custom-row">
+              <input id="item-custom-shortname" class="search-input itemshop-custom-input" placeholder="手动输入 shortname（目录外的模组物品等）" title="与 F1 控制台 inventory.give 使用的短名一致">
+              <button type="button" class="cfg-btn cfg-btn-xs" id="item-custom-add">加入已选</button>
+            </div>
+            <div class="itemshop-tabs" id="itemshop-tabs">
+              <button class="itemshop-tab-btn active" data-cat="all">全部 <em class="itemshop-tab-count" data-cat-count="all">0</em></button>
+              <button class="itemshop-tab-btn" data-cat="weapon">武器 <em class="itemshop-tab-count" data-cat-count="weapon">0</em></button>
+              <button class="itemshop-tab-btn" data-cat="ammo">弹药 <em class="itemshop-tab-count" data-cat-count="ammo">0</em></button>
+              <button class="itemshop-tab-btn" data-cat="armor">护甲 <em class="itemshop-tab-count" data-cat-count="armor">0</em></button>
+              <button class="itemshop-tab-btn" data-cat="resource">资源 <em class="itemshop-tab-count" data-cat-count="resource">0</em></button>
+              <button class="itemshop-tab-btn" data-cat="tool" title="建筑、电器、食品、杂物等">工具/其他 <em class="itemshop-tab-count" data-cat-count="tool">0</em></button>
+              <button class="itemshop-tab-btn" data-cat="medical">医疗 <em class="itemshop-tab-count" data-cat-count="medical">0</em></button>
+            </div>
+            <div class="itemshop-items-grid" id="itemshop-items-grid"></div>
+          </div>
+        </div>
+
+        <!-- 中间：已选物品列表 + 数量设置 -->
+        <div class="itemshop-center">
+          <div class="itemshop-card">
+            <div class="itemshop-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 6h12M4 10h12M4 14h8" stroke="#3fb950" stroke-width="1.5" stroke-linecap="round"/></svg>
+              已选物品列表
+              <span class="itemshop-header-hint" id="itemshop-selected-summary">0 种 · 共 0 件</span>
+              <button type="button" class="itemshop-clear-btn u-hidden" id="itemshop-clear-selected" title="清空已选物品">清空</button>
+            </div>
+            <div class="itemshop-selected-list" id="itemshop-selected-list">
+              <div class="itemshop-empty-hint">👈 请从左侧选择要发放的物品</div>
+            </div>
+            <div class="itemshop-quantity-bulk">
+              <span>批量设置数量：</span>
+              <input id="bulk-quantity" class="cfg-input cfg-input-xs" type="number" value="1" min="1" placeholder="数量">
+              <button class="cfg-btn cfg-btn-ghost" onclick="setBulkQuantity()">应用</button>
+            </div>
+          </div>
+
+          <div class="itemshop-card">
+            <div class="itemshop-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="6" r="3.5" stroke="#58a6ff" stroke-width="1.5"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+              选择目标玩家
+            </div>
+            <div class="itemshop-player-section">
+              <div class="itemshop-player-options">
+                <label class="itemshop-radio-label">
+                  <input type="radio" name="item-target" value="online" checked onchange="switchItemTarget('online')">
+                  <span>在线玩家</span>
+                </label>
+                <label class="itemshop-radio-label">
+                  <input type="radio" name="item-target" value="all" onchange="switchItemTarget('all')">
+                  <span>全体在线玩家</span>
+                </label>
+              </div>
+              <div class="itemshop-custom-row u-mb-8">
+                <input id="item-target-steamid" class="search-input itemshop-custom-input" placeholder="或直接输入目标 SteamID（优先使用）" title="输入后将直接按 SteamID 发放给该玩家">
+              </div>
+              <div id="itemshop-player-list" class="itemshop-player-list"></div>
+              <div id="itemshop-target-info" class="itemshop-target-info">已选择 <b id="item-target-count">0</b> 名玩家</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧：预设管理 + 发放 -->
+        <div class="itemshop-right">
+          <div class="itemshop-card">
+            <div class="itemshop-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M3 6l4 4 10-10" stroke="#d29922" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              预设管理
+            </div>
+            <div class="itemshop-preset-actions">
+              <input id="item-preset-name" class="search-input itemshop-custom-input" placeholder="输入预设名称（不填则自动命名）" title="用于保存当前物品组合">
+              <button class="cfg-btn cfg-btn-primary" onclick="saveItemPreset()">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                保存当前配置
+              </button>
+              <select id="item-preset-select" class="conn-select u-my-8" title="加载物品预设" onchange="loadItemPreset()">
+                <option value="">-- 加载预设 --</option>
+              </select>
+            </div>
+            <div id="itemshop-preset-list" class="itemshop-preset-list"></div>
+          </div>
+
+          <div class="itemshop-card itemshop-action-card">
+            <div class="itemshop-card-header">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M10 2l8 6v8l-8 4-8-4V8l8-6z" stroke="#e8611a" stroke-width="1.5"/><path d="M10 10v6M10 6v.01" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round"/></svg>
+              发放物品
+            </div>
+            <div class="itemshop-summary" id="itemshop-summary">
+              <div class="itemshop-summary-row">
+                <span>物品种类：</span>
+                <b id="summary-item-count">0</b> 种
+              </div>
+              <div class="itemshop-summary-row">
+                <span>目标玩家：</span>
+                <b id="summary-player-count">0</b> 名
+              </div>
+              <div class="itemshop-summary-row">
+                <span>总发放次数：</span>
+                <b id="summary-total-cmd">0</b> 次
+              </div>
+            </div>
+            <button class="cfg-btn cfg-btn-success itemshop-send-btn" onclick="sendItemShopItems()">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M2 10l6-6v4h10v4H8v4l-6-6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              确认发放物品
+            </button>
+            <button class="cfg-btn cfg-btn-ghost u-mt-8" onclick="clearItemShopSelection()">清空选择</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 使用日志 -->
+    <div class="tab-panel" id="panel-usagelog">
+      <div class="panel-toolbar">
+        <div class="toolbar-left">
+          <div class="console-filters usage-filters">
+            <button class="filter-btn active usage-filter-btn" id="usage-filter-all">全部</button>
+            <button class="filter-btn usage-filter-btn" id="usage-filter-cmd">指令</button>
+            <button class="filter-btn usage-filter-btn" id="usage-filter-perm">权限</button>
+            <button class="filter-btn usage-filter-btn" id="usage-filter-config">配置</button>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <span class="usage-log-hint">日志自动上报给开发者 (echo)</span>
+          <button class="tool-btn tool-btn-primary" id="btn-export-log">
+            <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M2 10v3h12v-3M8 2v8M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            导出日志
+          </button>
+          <button class="tool-btn tool-btn-danger" id="btn-clear-log">
+            <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M2 4h12M6 4V3h4v1M5 4v8h6V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            清空日志
+          </button>
+        </div>
+      </div>
+      <div class="log-info-card usage-log-info-card">
+        <div class="log-info-left">
+          <div class="log-info-icon">📊</div>
+          <div class="log-info-text">
+            <h4>使用日志</h4>
+            <p id="usage-log-count">所有操作记录均会同步到开发者（echo），包括指令、权限修改、服务器配置等操作</p>
+          </div>
+        </div>
+        <button class="cfg-btn cfg-btn-ghost usage-report-btn" onclick="reportUsageToOwner()">立即上报</button>
+      </div>
+      <div class="log-table-area usage-log-table-area">
+        <table class="log-table">
+          <thead><tr><th>时间</th><th>类型</th><th>详情</th></tr></thead>
+          <tbody id="usage-tbody">
+            <tr class="empty-row"><td colspan="3"><div class="empty-state"><p>暂无日志记录</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 关于软件 -->
+    <div class="tab-panel" id="panel-about">
+      <div class="about-page">
+        <div class="about-hero">
+          <div class="about-icon-wrap">
+            <img class="about-logo-img" src="../assets/logo-256.png" alt="RustAdmin" draggable="false">
+          </div>
+          <h1 class="about-app-name">RustAdmin</h1>
+          <p class="about-tagline">Rust 腐蚀服务器管理工具</p>
+          <div class="about-qq-avatar">
+            <img src="https://q1.qlogo.cn/g?b=qq&nk=3152187016&s=100" alt="开发者 QQ 头像" class="about-qq-avatar-img">
+          </div>
+        </div>
+
+        <div class="about-cards">
+            <div class="about-card">
+            <div class="about-card-label">开发者</div>
+            <div class="about-card-value">echo</div>
+          </div>
+          <div class="about-card">
+            <div class="about-card-label">BUG反馈新增功能联系QQ</div>
+            <div class="about-card-value about-qq">3152187016</div>
+          </div>
+          <div class="about-card">
+            <div class="about-card-label">当前版本</div>
+            <div class="about-card-value">1.3</div>
+          </div>
+          <div class="about-card">
+            <div class="about-card-label">最新公告</div>
+            <div class="about-card-value">新增一些功能中~</div>
+          </div>
+        </div>
+
+        <div class="about-thanks">
+          <div class="about-thanks-label">感谢提供帮助</div>
+          <div class="about-thanks-avatars">
+            <div class="about-thanks-avatar-item">
+              <img src="https://q1.qlogo.cn/g?b=qq&nk=834537945&s=100" alt="QQ 834537945 头像" class="about-thanks-avatar-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22%3E%3Crect width=%2256%22 height=%2256%22 rx=%2228%22 fill=%22%231e2a3d%22/%3E%3Ctext x=%2228%22 y=%2236%22 text-anchor=%22middle%22 fill=%22%239aaec8%22 font-size=%2220%22%3E%3F%3C/text%3E%3C/svg%3E'">
+              <span class="about-thanks-qq">834537945</span>
+            </div>
+            <div class="about-thanks-avatar-item">
+              <img src="https://q1.qlogo.cn/g?b=qq&nk=756137897&s=100" alt="QQ 756137897 头像" class="about-thanks-avatar-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22%3E%3Crect width=%2256%22 height=%2256%22 rx=%2228%22 fill=%22%231e2a3d%22/%3E%3Ctext x=%2228%22 y=%2236%22 text-anchor=%22middle%22 fill=%22%239aaec8%22 font-size=%2220%22%3E%3F%3C/text%3E%3C/svg%3E'">
+              <span class="about-thanks-qq">756137897</span>
+            </div>
+            <div class="about-thanks-avatar-item">
+              <img src="https://q1.qlogo.cn/g?b=qq&nk=963073346&s=100" alt="QQ 963073346 头像（TTOOBBTT）" class="about-thanks-avatar-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22%3E%3Crect width=%2256%22 height=%2256%22 rx=%2228%22 fill=%22%231e2a3d%22/%3E%3Ctext x=%2228%22 y=%2236%22 text-anchor=%22middle%22 fill=%22%239aaec8%22 font-size=%2220%22%3ET%3C/text%3E%3C/svg%3E'">
+              <span class="about-thanks-name">TTOOBBTT</span>
+              <span class="about-thanks-qq">963073346</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-links">
+          <button class="about-link-btn" onclick="window.rustAPI.openUrl('https://rust.facepunch.com')">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Rust 官网
+          </button>
+          <button class="about-link-btn" onclick="window.rustAPI.openUrl('https://umod.org')">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+            UMOD
+          </button>
+          <button class="about-link-btn" onclick="window.rustAPI.openUrl('https://rustsb.com')">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M10 2l8 4v6l-8 4-8-4V6l8-4z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="3" fill="currentColor" opacity="0.5"/></svg>
+            中文插件网
+          </button>
+        </div>
+
+        <div class="about-version-info">
+          <p>内置对 Rust 服务器 RCON 的 WebSocket 连接支持</p>
+          <p>支持 Oxide 插件管理、玩家控制、服务器配置等全部功能</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #main-content -->
+
+  <!-- 新闻滚动条（置于主内容下方，不占面板顶部空间） -->
+  <div class="news-ticker" role="status" aria-live="polite"><span class="wipe-chip" id="wipe-chip" title="Rust 官方每月强制清档时间（每月第一个周四 19:00 UTC，北京时间为次日 03:00）">下次官清 …</span>
+    <div class="news-ticker-label">
+      <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><circle cx="8" cy="8" r="6" stroke="#e8611a" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round"/></svg>
+      RUST 最新动态
+    </div>
+    <div class="news-ticker-track" id="news-ticker-track">
+      <div class="news-ticker-content"></div>
+    </div>
+  </div>
+
+    </div><!-- .app-main -->
+  </div><!-- .app-shell -->
+
+  <!-- 开发者密码验证弹窗 -->
+  <div class="modal-overlay u-hidden" id="dev-password-modal">
+    <div class="modal dev-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="3" y="8" width="14" height="10" rx="2" stroke="#e8611a" stroke-width="1.5"/><path d="M7 8V5a3 3 0 0 1 6 0v3" stroke="#e8611a" stroke-width="1.5"/></svg>
+          开发者模式
+        </div>
+        <button class="modal-close" id="btn-close-dev-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="dev-password-hint">
+          <p>请输入开发者密码</p>
+          <p class="dev-hint-small">提示：按 Ctrl+Shift+D 打开此窗口</p>
+        </div>
+        <div class="dev-password-input-wrap">
+          <input id="dev-password-input" class="cfg-input" type="password" placeholder="输入密码..." autocomplete="off">
+          <button class="cfg-btn cfg-btn-primary" id="btn-verify-dev-password">验证</button>
+        </div>
+        <div class="dev-password-error u-hidden" id="dev-password-error">
+          <svg viewBox="0 0 20 20" width="14" height="14" fill="none"><circle cx="10" cy="10" r="8" stroke="#f85149" stroke-width="1.5"/><path d="M10 6v5M10 13v.5" stroke="#f85149" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>密码错误，请重试</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 开发者配置面板（验证后显示） -->
+    <div class="modal dev-config-modal u-hidden" id="dev-config-panel">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M10 2l1.5 3.5L15 7l-3.5 1.5L10 12l-1.5-3.5L5 7l3.5-1.5L10 2z" stroke="#e8611a" stroke-width="1.5"/><path d="M3 13l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" stroke="#e8611a" stroke-width="1.5"/></svg>
+          开发者配置
+        </div>
+        <button class="modal-close" id="btn-close-dev-config">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="dev-form-group">
+          <label class="dev-form-label">QQ 机器人 HTTP API 地址</label>
+          <div class="dev-form-input-row">
+            <input id="dev-qqbot-url" class="cfg-input" placeholder="请输入 QQ 机器人 API 地址">
+            <button class="cfg-btn" id="btn-test-qqbot">测试</button>
+          </div>
+          <div class="dev-form-help">支持 CoolQ HTTP API / go-cqhttp / Lagrange Core 等框架</div>
+        </div>
+        
+        <div class="dev-form-group">
+          <label class="dev-form-label">上报状态</label>
+          <div class="dev-form-status" id="dev-report-status">
+            <span class="dev-status-dot"></span>
+            <span id="dev-report-text">未上报</span>
+          </div>
+        </div>
+        
+        <div class="dev-form-actions">
+          <button class="cfg-btn cfg-btn-primary" id="btn-save-dev-config">
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none"><path d="M16 5L7 14l-3-3 3-3 7 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            保存配置
+          </button>
+          <button class="cfg-btn cfg-btn-warn" id="btn-reset-report">重置上报状态</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 玩家操作弹窗 -->
+  <div class="modal-overlay u-hidden" id="player-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="6" r="3.5" stroke="#e8611a" stroke-width="1.5"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round"/></svg>
+          玩家操作 — <span id="modal-player-name"></span>
+        </div>
+        <button class="modal-close" id="btn-close-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-info-row">
+          <div class="modal-info-item">
+            <span class="modal-info-label">SteamID</span>
+            <span class="modal-info-value" id="modal-steamid"></span>
+          </div>
+          <div class="modal-info-item">
+            <span class="modal-info-label">IP地址</span>
+            <span class="modal-info-value" id="modal-ip"></span>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">踢出 / 封禁</div>
+          <div class="modal-row">
+            <input id="kick-reason" class="cfg-input" placeholder="踢出原因（可留空）">
+            <button class="cfg-btn cfg-btn-warn" id="btn-do-kick">踢出</button>
+          </div>
+          <div class="modal-row">
+            <input id="ban-reason" class="cfg-input" placeholder="封禁原因">
+            <button class="cfg-btn cfg-btn-danger" id="btn-do-ban">封禁</button>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">传送</div>
+          <div class="modal-row">
+            <select id="teleport-from" class="cfg-input" aria-label="选择要传送的玩家"></select>
+            <select id="teleport-to" class="cfg-input" aria-label="选择传送到的玩家"></select>
+          </div>
+          <div class="modal-row">
+            <button class="cfg-btn cfg-btn-primary" id="btn-do-teleport">传送到所选玩家</button>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">禁言管理</div>
+          <div class="modal-row">
+            <input id="mute-duration" class="cfg-input cfg-input-xs" type="number" placeholder="时长">
+            <select id="mute-unit" class="cfg-input cfg-input-xs" aria-label="禁言单位">
+              <option value="hours" selected>小时</option>
+              <option value="minutes">分钟</option>
+            </select>
+            <button class="cfg-btn cfg-btn-warn" id="btn-do-mute">禁言</button>
+            <button class="cfg-btn cfg-btn-ghost" id="btn-do-unmute">解除禁言</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steam 游戏封禁详情弹窗（集成到在线玩家表格点击） -->
+  <div class="modal-overlay u-hidden" id="steam-ban-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M10 2l8 4v4c0 5.2-3.4 8.1-8 8-4.6.1-8-2.8-8-8V6l8-4Z" stroke="#e8611a" stroke-width="1.5" stroke-linejoin="round"/><path d="M7.5 10.2l1.5 1.6 3.5-3.9" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Steam 封禁详情 — <span id="steam-ban-steamid"></span>
+        </div>
+        <button class="modal-close" id="btn-close-steam-ban-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">封禁汇总</div>
+          <div class="modal-row steam-ban-summary-row">
+            <div class="modal-info-item steam-ban-item-sm">
+              <span class="modal-info-label">游戏封禁</span>
+              <span class="modal-info-value" id="steam-ban-count">-</span>
+            </div>
+            <div class="modal-info-item steam-ban-item-sm">
+              <span class="modal-info-label">VAC 封禁</span>
+              <span class="modal-info-value" id="steam-ban-vac">-</span>
+            </div>
+            <div class="modal-info-item steam-ban-item-lg">
+              <span class="modal-info-label">距上次封禁</span>
+              <span class="modal-info-value" id="steam-ban-days">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">被封禁的游戏</div>
+          <div class="modal-row">
+            <div id="steam-ban-games" class="steam-ban-games"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 权限选择器弹窗（用于权限组添加权限） -->
+  <div class="modal-overlay u-hidden" id="perm-picker-modal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 7.5c0-2.5 2.2-4.5 6-4.5s6 2 6 4.5-2.2 4.5-6 4.5-6-2-6-4.5Z" stroke="#e8611a" stroke-width="1.5"/><path d="M4.5 11.5c.9 2.2 3 3.5 5.5 3.5s4.6-1.3 5.5-3.5" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round"/></svg>
+          选择要授予的权限 — <span id="perm-picker-group"></span>
+        </div>
+        <button class="modal-close" id="btn-close-perm-picker">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">搜索权限</div>
+          <div class="modal-row">
+            <input id="perm-picker-search" class="cfg-input" placeholder="例如：oxide、kits、vip、*.use ...">
+            <button class="cfg-btn cfg-btn-ghost" id="btn-perm-picker-clear">清空</button>
+          </div>
+          <div class="modal-row perm-picker-stats-row">
+            <span class="perm-picker-stat">已勾选 <b id="perm-picker-selected">0</b> 项</span>
+            <span class="perm-picker-stat">权限总数 <b id="perm-picker-total">0</b></span>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">权限列表</div>
+          <div class="perm-picker-list" id="perm-picker-list"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="cfg-btn cfg-btn-ghost" id="btn-perm-picker-cancel">取消</button>
+        <button class="cfg-btn cfg-btn-primary" id="btn-perm-picker-apply">添加到该组</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加服务器弹窗 -->
+  <div class="modal-overlay u-hidden" id="add-server-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="#e8611a" stroke-width="1.5"/><path d="M2 8h16" stroke="#e8611a" stroke-width="1.5"/><circle cx="5" cy="6" r="0.8" fill="#e8611a"/><circle cx="8" cy="6" r="0.8" fill="#e8611a"/></svg>
+          添加服务器
+        </div>
+        <button class="modal-close" id="btn-cancel-add-server">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label>服务器名称</label>
+          <input id="new-srv-name" class="cfg-input" placeholder="我的服务器">
+        </div>
+        <div class="modal-field">
+          <label>IP地址</label>
+          <input id="new-srv-ip" class="cfg-input" placeholder="服务器 IP 地址">
+        </div>
+        <div class="modal-field">
+          <label>RCON 端口</label>
+          <input id="new-srv-port" class="cfg-input" placeholder="28016" value="28016">
+        </div>
+        <div class="modal-field">
+          <label>RCON 密码</label>
+          <input id="new-srv-pass" class="cfg-input" type="password" placeholder="密码">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="cfg-btn cfg-btn-ghost" id="btn-cancel-modal">取消</button>
+        <button class="cfg-btn cfg-btn-primary" id="btn-confirm-add-server">确认保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast 通知 -->
+  <div id="toast-container"></div>
+
+  <!-- 玩家属性弹窗（备注、标记、历史记录） -->
+  <div class="modal-overlay u-hidden" id="player-profile-modal">
+    <div class="modal modal-md">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><circle cx="10" cy="6" r="3.5" stroke="#e8611a" stroke-width="1.5"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#e8611a" stroke-width="1.5" stroke-linecap="round"/></svg>
+          玩家属性 — <span id="profile-modal-name"></span>
+        </div>
+        <button class="modal-close" id="btn-close-profile-modal">✕</button>
+      </div>
+      <div class="modal-body" style="padding:0;">
+        <!-- 基础信息卡片 -->
+        <div class="profile-info-row">
+          <div class="profile-info-item">
+            <span class="profile-info-label">SteamID</span>
+            <span class="profile-info-val" id="profile-modal-steamid">-</span>
+          </div>
+          <div class="profile-info-item">
+            <span class="profile-info-label">IP</span>
+            <span class="profile-info-val" id="profile-modal-ip">-</span>
+          </div>
+          <div class="profile-info-item">
+            <span class="profile-info-label">标记</span>
+            <span class="profile-info-val" id="profile-modal-marked">-</span>
+          </div>
+        </div>
+
+        <!-- 备注区 -->
+        <div class="profile-section">
+          <div class="profile-section-title">备注</div>
+          <div class="profile-note-row">
+            <input class="cfg-input" id="profile-note-input" placeholder="为该玩家添加备注...">
+            <button class="cfg-btn cfg-btn-primary" id="btn-profile-save-note">保存</button>
+          </div>
+        </div>
+
+        <!-- 操作历史 -->
+        <div class="profile-section profile-section-last">
+          <div class="profile-section-title">操作历史 <span class="profile-hist-count" id="profile-hist-count"></span></div>
+          <div class="profile-history-list" id="profile-history-list">
+            <div class="empty-state u-py-18"><p>暂无历史记录</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 玩家右键菜单 -->
+  <div id="player-context-menu" class="u-hidden player-context-menu">
+    <!-- 管理操作 -->
+    <button class="tool-btn tool-btn-warn" id="ctx-kick">踢出</button>
+    <button class="tool-btn tool-btn-warn" id="ctx-mute">禁言</button>
+    <button class="tool-btn" id="ctx-unmute">取消禁言</button>
+    <button class="tool-btn tool-btn-danger" id="ctx-kill">Kill</button>
+    <div class="ctx-divider"></div>
+    
+    <!-- 封禁选项 -->
+    <div class="ctx-submenu-title">封禁</div>
+    <button class="tool-btn tool-btn-danger" id="ctx-ban-permanent">永久封禁</button>
+    <button class="tool-btn tool-btn-warn" id="ctx-ban-1h">1 小时</button>
+    <button class="tool-btn tool-btn-warn" id="ctx-ban-1d">1 天</button>
+    <button class="tool-btn tool-btn-warn" id="ctx-ban-7d">7 天</button>
+    <button class="tool-btn tool-btn-warn" id="ctx-ban-custom">自定义...</button>
+    <div class="ctx-divider"></div>
+    
+    <!-- 复制信息 -->
+    <div class="ctx-submenu-title">复制</div>
+    <button class="tool-btn" id="ctx-copy-steamid">SteamID</button>
+    <button class="tool-btn" id="ctx-copy-name">网名</button>
+    <button class="tool-btn" id="ctx-copy-displayname">玩家名</button>
+    <button class="tool-btn" id="ctx-copy-ip">IP</button>
+    <div class="ctx-divider"></div>
+    
+    <!-- 查看信息 -->
+    <div class="ctx-submenu-title">查看</div>
+    <button class="tool-btn" id="ctx-open-steam">Steam资料</button>
+    <button class="tool-btn" id="ctx-open-profile">RustAdmin资料</button>
+    <button class="tool-btn" id="ctx-kd-stats">K/D 数据</button>
+    <button class="tool-btn" id="ctx-combat-records">战斗记录</button>
+    <button class="tool-btn" id="ctx-history">历史记录</button>
+    <div class="ctx-divider"></div>
+    
+    <!-- 其他 -->
+    <button class="tool-btn" id="ctx-mark">设置标记</button>
+    <button class="tool-btn" id="ctx-note">查看备注</button>
+    <button class="tool-btn" id="ctx-teleport">传送</button>
+    <button class="tool-btn" id="ctx-give-item">给予物品</button>
+    <button class="tool-btn tool-btn-danger" id="ctx-reset-data">重置数据</button>
+  </div>
+
+  <!-- 封禁弹窗 -->
+  <div class="modal-overlay u-hidden" id="ban-config-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">封禁设置</div>
+        <button class="modal-close" id="btn-close-ban-config">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label>SteamID</label>
+          <input id="ban-config-steamid" class="cfg-input" title="SteamID" placeholder="SteamID" readonly>
+        </div>
+        <div class="modal-field">
+          <label>封禁原因</label>
+          <input id="ban-config-reason" class="cfg-input" placeholder="违规行为">
+        </div>
+        <div class="modal-field">
+          <label>临时封禁分钟（0=永久）</label>
+          <input id="ban-config-minutes" class="cfg-input" type="number" min="0" value="0" title="临时封禁分钟">
+        </div>
+        <label class="tag-chip"><input id="ban-config-global" type="checkbox"> 全局封禁（写入本地库）</label>
+        <label class="tag-chip"><input id="ban-config-sync" type="checkbox"> 所有服务器同步</label>
+        <label class="tag-chip"><input id="ban-config-ip" type="checkbox"> 同时记录 IP 段封禁</label>
+      </div>
+      <div class="modal-footer">
+        <button class="cfg-btn cfg-btn-ghost" id="btn-cancel-ban-config">取消</button>
+        <button class="cfg-btn cfg-btn-danger" id="btn-confirm-ban-config">确认封禁</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 传送弹窗 -->
+  <div class="modal-overlay u-hidden" id="teleport-modal">
+    <div class="modal" style="width: 420px; max-width: 90vw;">
+      <div class="modal-header">
+        <div class="modal-title">传送玩家</div>
+        <button class="modal-close" id="btn-close-teleport">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label>要传送的玩家</label>
+          <input id="teleport-from-name" class="cfg-input" readonly>
+          <input id="teleport-from-steamid" type="hidden">
+        </div>
+        <div class="modal-field">
+          <label>传送到目标玩家</label>
+          <select id="teleport-target-select" class="cfg-input">
+            <option value="">-- 选择在线玩家 --</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="cfg-btn cfg-btn-ghost" id="btn-cancel-teleport">取消</button>
+        <button class="cfg-btn cfg-btn-primary" id="btn-confirm-teleport">传送</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="rustapi-web.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
